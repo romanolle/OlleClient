@@ -10,6 +10,13 @@
 		</layout>
 	</appender>
 	
+	<appender name="file" class="org.apache.log4j.FileAppender">
+		<param name="File" value="c://client_log.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+		</layout>
+	</appender>
+	
 	<!-- Application Loggers -->
 	<logger name="nf.co.olle">
 		<level value="info" />
@@ -34,8 +41,9 @@
 
 	<!-- Root Logger -->
 	<root>
-		<priority value="warn" />
+		<priority value="info" />
 		<appender-ref ref="console" />
+		<appender-ref ref="file" />
 	</root>
 	
 </log4j:configuration>
