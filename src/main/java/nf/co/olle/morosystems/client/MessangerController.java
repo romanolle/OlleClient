@@ -91,6 +91,7 @@ public class MessangerController {
 		
 		//odeslani nove zpravy pres Service Layer do databaze
 		String result=messageService.sendMessage(m);
+		model.addAttribute("result", result);
 		logger.info(result);
 		return "messages";
 	}
