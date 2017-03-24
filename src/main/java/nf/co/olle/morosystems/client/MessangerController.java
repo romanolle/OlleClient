@@ -76,6 +76,13 @@ public class MessangerController {
 	@RequestMapping(value="/message/add", method=RequestMethod.POST)
 	public String sendMessage(@Valid Message m,BindingResult bindingResult,Model model){
 		logger.info("run sendMessage method");
+		
+		if(bindingResult.hasErrors()){
+			logger.info("sendMessage method - bad values");
+			model.addAttribute("messages", messages);
+			return "messages";
+		}
+		
 		//pridani data vytvoreni
 		m.setCreated(new Date());
 		logger.info("Message's values: "+m.toString());

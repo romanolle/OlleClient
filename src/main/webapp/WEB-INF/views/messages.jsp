@@ -23,16 +23,19 @@
 	<form:form action="${addAction }" commandName="message">
 		<form:label path="name">Name: </form:label>
 		<form:input path="name" />
+		<form:errors path="name" />
 		
 		<br />
 		
 		<form:label path="email">E-mail: </form:label>
 		<form:input path="email" />
+		<form:errors path="email" />
 		
 		<br />
 		
 		<form:label path="message">Message: </form:label>
 		<form:input path="message" />
+		<form:errors path="message" />
 		
 		<br />
 		

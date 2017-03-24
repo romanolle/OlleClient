@@ -3,12 +3,20 @@ package nf.co.olle.morosystems.server;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.Email;
+
 public class Message implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private Integer id;
+	
+	@Size(min=2,max=24)
 	private String name;
+	@Email
 	private String email;
+	@Size(min=2,max=2000)
 	private String message;
 	private Date created;
 	
