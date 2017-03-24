@@ -1,16 +1,29 @@
 package nf.co.olle.morosystems.server;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class Message implements Serializable{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	private Integer id;
 	private String name;
 	private String email;
 	private String message;
+	private Date created;
+	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+	public Date getCreated() {
+		return created;
+	}
 	public String getName() {
 		return name;
 	}
@@ -33,6 +46,6 @@ public class Message implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "Name: "+name+", email: "+email+", message: "+message;
+		return created+" - Name: "+name+", email: "+email+", message: "+message;
 	}
 }

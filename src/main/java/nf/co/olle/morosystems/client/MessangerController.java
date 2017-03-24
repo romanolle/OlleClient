@@ -1,5 +1,7 @@
 package nf.co.olle.morosystems.client;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -17,6 +19,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import nf.co.olle.morosystems.client.service.IMessageService;
 import nf.co.olle.morosystems.server.Message;
 
+/**
+ * Prijima zpravy od uzivatele, ktere si uklada, kazdou prijatou zpravu odesle pres Service Layer na ulozeni do databaze.
+ * Vsechny metoda vraci zpatky stranku messages.jsp + do modelu pridavaji seznam uzivatelu.
+ * @author Roman Olle
+ *
+ */
 @Controller
 public class MessangerController {
 
@@ -32,26 +40,58 @@ public class MessangerController {
 		this.messageService = messageService;
 	}
 	
+	/**
+	 * Default page=>pridani do modelu list zprav a prazdnou instanci zpravy pro formular.
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value="/",method=RequestMethod.GET)
 	public String home(Model model){
 		logger.info("run home method");
 		model.addAttribute("message", new Message());
+		model.addAttribute("messages", messages);
 		return "messages";
 	}
 	
+	/**
+	 * Shodne s default page
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value="/messages",method=RequestMethod.GET)
 	public String listOfMessages(Model model){
 		logger.info("run listOfMessages method");
 		model.addAttribute("message", new Message());
+		model.addAttribute("messages", messages);
 		return "messages";
 	}
 	
+	/**
+	 * URL pro odeslani zpravy, ktera se posle do databaze pres service layer.
+	 * @param m Zprava
+	 * @param bindingResult
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value="/message/add", method=RequestMethod.POST)
 	public String sendMessage(@Valid Message m,BindingResult bindingResult,Model model){
 		logger.info("run sendMessage method");
+		//pridani data vytvoreni
+		m.setCreated(new Date());
 		logger.info("Message's values: "+m.toString());
+
+		if(messages==null)
+			messages=new ArrayList<Message>();
+		messages.add(m);
+		
 		model.addAttribute("message", new Message());
-		logger.info(messageService.sendMessage(m));
+		model.addAttribute("messages", messages);
+		
+		
+		
+		//odeslani nove zpravy pres Service Layer do databaze
+		String result=messageService.sendMessage(m);
+		logger.info(result);
 		return "messages";
 	}
 }

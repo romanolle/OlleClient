@@ -13,26 +13,32 @@
 </head>
 <body>
 
-<c:url var="addAction" value="/message/add" ></c:url>
-
-<form:form action="${addAction }" commandName="message">
-	<form:label path="name">Name: </form:label>
-	<form:input path="name" />
+	<c:url var="addAction" value="/message/add" ></c:url>
 	
-	<br />
+	<form:form action="${addAction }" commandName="message">
+		<form:label path="name">Name: </form:label>
+		<form:input path="name" />
+		
+		<br />
+		
+		<form:label path="email">E-mail: </form:label>
+		<form:input path="email" />
+		
+		<br />
+		
+		<form:label path="message">Message: </form:label>
+		<form:input path="message" />
+		
+		<br />
+		
+		<input type="submit" value="Send" />
+	</form:form>
 	
-	<form:label path="email">E-mail: </form:label>
-	<form:input path="email" />
-	
-	<br />
-	
-	<form:label path="message">Message: </form:label>
-	<form:input path="message" />
-	
-	<br />
-	
-	<input type="submit" value="Send" />
-</form:form>
-
+	<c:if test="${!empty messages }">
+		<h2>Messages</h2>
+		<c:forEach items="${messages }" var="m">
+			${m.name} (${m.email}): ${m.message} - ${m.created}<br />
+		</c:forEach>
+	</c:if>
 </body>
 </html>
