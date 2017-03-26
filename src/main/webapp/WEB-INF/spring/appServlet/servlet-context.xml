@@ -3,9 +3,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
@@ -24,10 +26,73 @@
 	<context:component-scan base-package="nf.co.olle.morosystems.client" />
 	
 	
-	
+<!-- Hessian protokol - client -->	
 	<beans:bean id="messageService" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
 		<beans:property name="serviceUrl" value="http://localhost:8080/olleServer/"></beans:property>
 		<beans:property name="serviceInterface" value="nf.co.olle.morosystems.client.service.IMessageService"></beans:property>
 	</beans:bean>
 	
+	
+<!-- 
+Quartz scheduler (kazdych 10 sekund) - Bean + trigger
+ -->
+	<beans:bean id="everyTenSecondsScheduler" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<beans:property name="jobClass" value="nf.co.olle.morosystems.client.scheduler.EveryTenSecondsScheduler"></beans:property>
+		<beans:property name="jobDataAsMap">
+			<util:map>
+				<beans:entry key="messageService" value-ref="messageService"></beans:entry>
+			</util:map>
+		</beans:property>
+	</beans:bean>
+	
+	<beans:bean id="everyMinuteTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
+		<beans:property name="jobDetail" ref="everyTenSecondsScheduler"></beans:property>
+		<beans:property name="startDelay" value="4000"></beans:property>
+		<beans:property name="repeatInterval" value="4000"></beans:property>
+	</beans:bean>
+	
+	
+<!-- 
+Quartz scheduler (spusti se kazdou minutu, kdy pocet sekund je 00 = 15:37:00) - Bean + trigger
+ -->
+	<beans:bean id="everyMinuteScheduler" class="org.springframework.scheduling.quartz.JobDetailBean">
+		<beans:property name="jobClass" value="nf.co.olle.morosystems.client.scheduler.EveryMinuteScheduler"></beans:property>
+		<beans:property name="jobDataAsMap">
+			<util:map>
+				<beans:entry key="messageService" value-ref="messageService"></beans:entry>
+			</util:map>
+		</beans:property>
+	</beans:bean>
+	
+	<beans:bean id="everyHoursTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<beans:property name="jobDetail" ref="everyMinuteScheduler"></beans:property>
+		
+<!-- pro muj priklad se spusti kazdou minutu v 00 sekund -->
+		<beans:property name="cronExpression" value="0 * * * * ?"></beans:property>
+	</beans:bean>
+	
+	
+<!-- 
+pridani obou triggeru do scheduleru
+ -->
+	<beans:bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<beans:property name="jobDetails">
+			<util:list>
+				<beans:ref bean="everyTenSecondsScheduler"/>
+				<beans:ref bean="everyMinuteScheduler"/>
+			</util:list>
+		</beans:property>
+	
+		<beans:property name="triggers">
+			<util:list>
+				<beans:ref bean="everyMinuteTrigger"/>
+				<beans:ref bean="everyHoursTrigger"/>
+			</util:list>
+		</beans:property>
+		<beans:property name="quartzProperties">
+			<util:map>
+				<beans:entry key="org.quartz.threadPool.class" value="org.quartz.simpl.SimpleThreadPool"></beans:entry>
+			</util:map>
+		</beans:property>
+	</beans:bean>
 </beans:beans>
